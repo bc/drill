@@ -17,7 +17,6 @@ export function WellReportFlow() {
   const [isLoading, setIsLoading] = useState(false);
   const [report, setReport] = useState<WellReport | null>(null);
   const [verificationCode, setVerificationCode] = useState('');
-  const [sentCode, setSentCode] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,14 +36,10 @@ export function WellReportFlow() {
 
     try {
       // Simulate Twilio SMS verification
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      setSentCode(code);
-
-      // Simulate sending SMS
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      toast.success(`Verification code sent to ${phone}! (Code: ${code})`, {
-        duration: 8000,
+      toast.success(`Verification code sent to ${phone}! (Enter any 6-digit code)`, {
+        duration: 5000,
       });
     } catch (error) {
       toast.error('Failed to send verification code');
@@ -57,8 +52,9 @@ export function WellReportFlow() {
   const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (verificationCode !== sentCode) {
-      toast.error('Invalid verification code');
+    // Accept any 6-digit code
+    if (!/^\d{6}$/.test(verificationCode)) {
+      toast.error('Please enter a 6-digit code');
       return;
     }
 
@@ -112,7 +108,6 @@ export function WellReportFlow() {
     setAddress('');
     setPhone('');
     setVerificationCode('');
-    setSentCode('');
     setReport(null);
   };
 
