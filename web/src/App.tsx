@@ -1,18 +1,12 @@
 import { Hero } from './components/Hero';
-import { Features } from './components/Features';
-import { HowItWorks } from './components/HowItWorks';
-import { About } from './components/About';
-import { Testimonials } from './components/Testimonials';
+import { ChatbotSection } from './components/ChatbotSection';
 import { Footer } from './components/Footer';
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <Hero />
-      <Features />
-      <HowItWorks />
-      <About />
-      <Testimonials />
+      <ChatbotSection />
       <Footer />
     </div>
   );
