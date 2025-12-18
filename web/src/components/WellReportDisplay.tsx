@@ -1,6 +1,6 @@
 import { type WellReport } from '../lib/wellData';
 import { Card } from './ui/card';
-import { Droplet, TrendingUp, DollarSign, Layers, MapPin, Phone } from 'lucide-react';
+import { Droplet, TrendingUp, DollarSign, Layers, MapPin, Phone, Mountain } from 'lucide-react';
 import { Button } from './ui/button';
 
 interface WellReportDisplayProps {
@@ -9,7 +9,7 @@ interface WellReportDisplayProps {
 }
 
 export function WellReportDisplay({ report, phone }: WellReportDisplayProps) {
-  const { nearestWells, aquifers, avgDepth, depthRange, estimatedCost } = report;
+  const { nearestWells, aquifers, avgDepth, depthRange, estimatedCost, targetLocation } = report;
 
   const handleSendSMS = () => {
     // Simulate sending SMS with report
@@ -19,7 +19,7 @@ export function WellReportDisplay({ report, phone }: WellReportDisplayProps) {
   return (
     <div className="space-y-6">
       {/* Key Metrics */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className={`grid sm:grid-cols-2 gap-4 ${targetLocation.altitude ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`}>
         <Card className="p-4">
           <div className="flex items-start justify-between">
             <div>
@@ -67,6 +67,19 @@ export function WellReportDisplay({ report, phone }: WellReportDisplayProps) {
             <MapPin className="h-8 w-8 text-purple-500 opacity-70" />
           </div>
         </Card>
+
+        {targetLocation.altitude && (
+          <Card className="p-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Elevation</p>
+                <p className="text-2xl font-bold text-gray-900">{targetLocation.altitude.toLocaleString()}</p>
+                <p className="text-xs text-gray-500">feet above sea level</p>
+              </div>
+              <Mountain className="h-8 w-8 text-indigo-500 opacity-70" />
+            </div>
+          </Card>
+        )}
       </div>
 
       {/* Aquifer Information */}

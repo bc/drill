@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
-import { MapPin, Phone, Loader2, CheckCircle2 } from 'lucide-react';
+import { Phone, Loader2, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { geocodeAddress, loadWells, findNearestWells, generateWellReport, type WellReport } from '../lib/wellData';
+import { geocodeAddress, getElevation, loadWells, findNearestWells, generateWellReport, type WellReport } from '../lib/wellData';
 import { WellMap } from './WellMap';
 import { WellReportDisplay } from './WellReportDisplay';
+import { AddressAutocomplete } from './AddressAutocomplete';
 
 type Step = 'input' | 'verifying' | 'generating' | 'report';
 
@@ -81,6 +82,10 @@ export function WellReportFlow() {
         return;
       }
 
+      // Fetch elevation data
+      toast.info('Getting elevation data...');
+      const altitude = await getElevation(location.lat, location.lon);
+
       toast.info('Loading well data...');
       const allWells = await loadWells();
 
@@ -88,7 +93,7 @@ export function WellReportFlow() {
       const nearestWells = findNearestWells(location.lat, location.lon, allWells, 10);
 
       toast.info('Generating comprehensive report...');
-      const wellReport = generateWellReport(nearestWells, address, location.lat, location.lon);
+      const wellReport = generateWellReport(nearestWells, address, location.lat, location.lon, altitude || undefined);
 
       setReport(wellReport);
       setStep('report');
@@ -170,17 +175,11 @@ export function WellReportFlow() {
               <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
                 Property Address
               </label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <Input
-                  id="address"
-                  type="text"
-                  placeholder="123 Main St, Castle Rock, CO 80104"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  className="text-base pl-10"
-                />
-              </div>
+              <AddressAutocomplete
+                value={address}
+                onChange={setAddress}
+                placeholder="Start typing your address..."
+              />
               <p className="text-xs text-gray-500 mt-1">Must be in Douglas County, Colorado</p>
             </div>
 

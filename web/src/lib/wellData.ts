@@ -21,6 +21,7 @@ export interface WellReport {
     lat: number;
     lon: number;
     address: string;
+    altitude?: number;
   };
   nearestWells: Well[];
   aquifers: string[];
@@ -106,7 +107,8 @@ export function generateWellReport(
   nearestWells: Well[],
   address: string,
   lat: number,
-  lon: number
+  lon: number,
+  altitude?: number
 ): WellReport {
   // Extract unique aquifers
   const aquiferSet = new Set<string>();
@@ -140,7 +142,7 @@ export function generateWellReport(
   };
 
   return {
-    targetLocation: { lat, lon, address },
+    targetLocation: { lat, lon, address, altitude },
     nearestWells,
     aquifers: Array.from(aquiferSet).sort(),
     avgDepth,
@@ -179,6 +181,33 @@ export async function geocodeAddress(address: string): Promise<{
     return null;
   } catch (error) {
     console.error('Geocoding error:', error);
+    return null;
+  }
+}
+
+/**
+ * Get elevation/altitude for a given lat/lon using Open-Elevation API
+ */
+export async function getElevation(lat: number, lon: number): Promise<number | null> {
+  try {
+    const response = await fetch(
+      `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lon}`
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch elevation data');
+    }
+
+    const data = await response.json();
+    if (data.results && data.results.length > 0) {
+      // Convert meters to feet
+      const elevationMeters = data.results[0].elevation;
+      const elevationFeet = Math.round(elevationMeters * 3.28084);
+      return elevationFeet;
+    }
+    return null;
+  } catch (error) {
+    console.error('Elevation error:', error);
     return null;
   }
 }
