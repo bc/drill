@@ -1,6 +1,6 @@
 import { type WellReport } from '../lib/wellData';
 import { Card } from './ui/card';
-import { Droplet, TrendingUp, DollarSign, Layers, MapPin, Phone, Mountain } from 'lucide-react';
+import { Droplet, TrendingUp, DollarSign, Layers, MapPin, Phone, Mountain, Wrench, CheckCircle, Filter, Zap, FileText, Shield } from 'lucide-react';
 import { Button } from './ui/button';
 
 interface WellReportDisplayProps {
@@ -194,6 +194,218 @@ export function WellReportDisplay({ report, phone }: WellReportDisplayProps) {
         <p className="text-xs text-gray-500 mt-4">
           * Estimates are based on nearby wells and typical Douglas County drilling costs. Actual costs may vary based on geology, well depth, and contractor.
         </p>
+      </Card>
+
+      {/* Complete Water System Services */}
+      <Card className="p-6 border-2 border-blue-200 bg-gradient-to-br from-white to-blue-50">
+        <div className="flex items-start gap-3 mb-4">
+          <Shield className="h-7 w-7 text-blue-600 flex-shrink-0 mt-1" />
+          <div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Complete Water System Services</h3>
+            <p className="text-gray-700 mb-6">
+              Our vetted contractors handle everything from drilling to final installation. We manage all permitting, paperwork, secure available rebates, and ensure optimal system performance.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Core Services */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+              <Wrench className="h-5 w-5 text-blue-600" />
+              Core Well Services
+            </h4>
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-900">Complete Well Drilling</p>
+                  <p className="text-sm text-gray-600">Professional drilling, casing, and well completion</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-900">Pump Installation & Sizing</p>
+                  <p className="text-sm text-gray-600">Submersible pumps properly sized for your needs</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-900">Pressure Tank Systems</p>
+                  <p className="text-sm text-gray-600">Properly sized tanks for consistent water pressure</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-900">Complete Plumbing Integration</p>
+                  <p className="text-sm text-gray-600">Connect well to your home's water system</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Water Treatment */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+              <Filter className="h-5 w-5 text-blue-600" />
+              Water Treatment & Quality
+            </h4>
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-900">Water Filtration Systems</p>
+                  <p className="text-sm text-gray-600">Sediment, carbon, and whole-house filtration</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-900">Reverse Osmosis Systems</p>
+                  <p className="text-sm text-gray-600">Point-of-use RO for drinking water quality</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-900">Water Softeners</p>
+                  <p className="text-sm text-gray-600">Remove hardness and protect appliances</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-900">Water Quality Testing</p>
+                  <p className="text-sm text-gray-600">Comprehensive testing and treatment recommendations</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Backup & Reliability */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+              <Zap className="h-5 w-5 text-blue-600" />
+              Backup Power & Reliability
+            </h4>
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-900">Backup Generator Systems</p>
+                  <p className="text-sm text-gray-600">Automatic backup power for your well pump</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-900">Battery Backup Systems</p>
+                  <p className="text-sm text-gray-600">Silent, clean backup power during outages</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-900">Solar-Powered Pump Systems</p>
+                  <p className="text-sm text-gray-600">Off-grid and emergency water supply options</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-900">Water Storage Tanks</p>
+                  <p className="text-sm text-gray-600">Reserve supply for extended outages</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Support Services */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+              <FileText className="h-5 w-5 text-blue-600" />
+              Full-Service Support
+            </h4>
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-900">Permit & Paperwork Management</p>
+                  <p className="text-sm text-gray-600">Handle all county and state requirements</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-900">Water Rights Assistance</p>
+                  <p className="text-sm text-gray-600">Navigate Colorado water rights regulations</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-900">Rebate & Incentive Programs</p>
+                  <p className="text-sm text-gray-600">Secure available tax credits and local rebates</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-900">Ongoing Maintenance Plans</p>
+                  <p className="text-sm text-gray-600">Annual inspections and system optimization</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Services */}
+        <div className="mt-6 pt-6 border-t border-blue-200">
+          <h4 className="font-semibold text-gray-900 mb-4">Additional Water & Home Services</h4>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+              <Droplet className="h-4 w-4 text-blue-500" />
+              <span>Irrigation Systems</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+              <Droplet className="h-4 w-4 text-blue-500" />
+              <span>Hot Water Heaters</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+              <Droplet className="h-4 w-4 text-blue-500" />
+              <span>Tankless Water Systems</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+              <Droplet className="h-4 w-4 text-blue-500" />
+              <span>Greywater Recycling</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+              <Zap className="h-4 w-4 text-yellow-500" />
+              <span>Heat Pump Water Heaters</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+              <Zap className="h-4 w-4 text-yellow-500" />
+              <span>Whole-Home Generators</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+              <Zap className="h-4 w-4 text-yellow-500" />
+              <span>Solar Panel Integration</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+              <Shield className="h-4 w-4 text-green-500" />
+              <span>System Warranties</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 p-4 bg-white rounded-lg border border-blue-200">
+          <p className="text-sm text-gray-700">
+            <strong className="text-gray-900">Vetted Contractors Only:</strong> All recommended drilling companies and service providers are licensed, insured, and have proven track records in Douglas County. We ensure quality workmanship and competitive pricing.
+          </p>
+        </div>
       </Card>
     </div>
   );
