@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { getElevation, loadWells, findNearestWells, generateWellReport, type WellReport } from '../lib/wellData';
 import { WellMap } from './WellMap';
 import { WellReportDisplay } from './WellReportDisplay';
-import { GoogleAddressAutocomplete, type AddressDetails } from './GoogleAddressAutocomplete';
+import { AddressAutocomplete, type AddressDetails } from './AddressAutocomplete';
 
 type Step = 'input' | 'verifying' | 'generating' | 'report';
 
@@ -74,7 +74,7 @@ export function WellReportFlow() {
     setStep('generating');
 
     try {
-      // Use coordinates from Google Places (already have them)
+      // Use coordinates from address lookup
       const { lat, lng, formattedAddress } = addressDetails;
 
       // Fetch elevation data
@@ -171,7 +171,7 @@ export function WellReportFlow() {
               <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
                 Property Address
               </label>
-              <GoogleAddressAutocomplete
+              <AddressAutocomplete
                 value={address}
                 onChange={setAddress}
                 onSelectAddress={handleAddressSelect}
