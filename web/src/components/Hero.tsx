@@ -1,6 +1,6 @@
 import { ColoradoFlag } from './ColoradoFlag';
 import { CheckCircle } from 'lucide-react';
-import { WellReportFlow } from './WellReportFlow';
+import { ElevationForm } from './ElevationForm';
 
 export function Hero() {
   return (
@@ -13,45 +13,45 @@ export function Hero() {
           </div>
 
           <h1 className="text-4xl lg:text-5xl font-bold text-gray-900">
-            Get Your Comprehensive<br />Well Drilling Report
+            Check Your Property Elevation<br />& Water Access
           </h1>
 
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Instantly receive detailed information about well drilling at your location—including nearby wells, aquifers, depths, and cost estimates.
+            Enter your address to instantly see your property's elevation compared to nearby water reservoirs—essential information for well drilling decisions.
           </p>
         </div>
 
-        {/* Well Report Flow */}
-        <WellReportFlow />
+        {/* Elevation Form */}
+        <ElevationForm />
 
         {/* What's Included */}
         <div className="mt-12 max-w-3xl mx-auto">
           <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
-            <h3 className="font-semibold text-gray-900 mb-4 text-center">Your report includes:</h3>
+            <h3 className="font-semibold text-gray-900 mb-4 text-center">What you'll get:</h3>
             <div className="grid sm:grid-cols-2 gap-3">
               <div className="flex items-start gap-2">
                 <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700">Interactive map with 10 nearest wells</span>
+                <span className="text-sm text-gray-700">Your exact property elevation</span>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700">Well depths & aquifer data</span>
+                <span className="text-sm text-gray-700">Nearby reservoir elevations</span>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700">Detailed cost estimates</span>
+                <span className="text-sm text-gray-700">Elevation comparison analysis</span>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700">Available aquifer layers</span>
+                <span className="text-sm text-gray-700">Water pressure implications</span>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700">Distance analysis</span>
+                <span className="text-sm text-gray-700">Zone-specific reservoir data</span>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700">SMS delivery option</span>
+                <span className="text-sm text-gray-700">Free detailed assessment</span>
               </div>
             </div>
           </div>
