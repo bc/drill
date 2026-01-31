@@ -1,23 +1,28 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
 import { Phone, Loader2, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { geocodeAddress, getElevation, loadWells, findNearestWells, generateWellReport, type WellReport } from '../lib/wellData';
+import { getElevation, loadWells, findNearestWells, generateWellReport, type WellReport } from '../lib/wellData';
 import { WellMap } from './WellMap';
 import { WellReportDisplay } from './WellReportDisplay';
-import { AddressAutocomplete } from './AddressAutocomplete';
+import { GoogleAddressAutocomplete, type AddressDetails } from './GoogleAddressAutocomplete';
 
 type Step = 'input' | 'verifying' | 'generating' | 'report';
 
 export function WellReportFlow() {
   const [step, setStep] = useState<Step>('input');
   const [address, setAddress] = useState('');
+  const [addressDetails, setAddressDetails] = useState<AddressDetails | null>(null);
   const [phone, setPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [report, setReport] = useState<WellReport | null>(null);
   const [verificationCode, setVerificationCode] = useState('');
+
+  const handleAddressSelect = useCallback((details: AddressDetails) => {
+    setAddressDetails(details);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,41 +64,31 @@ export function WellReportFlow() {
       return;
     }
 
+    if (!addressDetails) {
+      toast.error('Please select an address from the dropdown');
+      setStep('input');
+      return;
+    }
+
     setIsLoading(true);
     setStep('generating');
 
     try {
-      // Geocode address
-      toast.info('Locating your property...');
-      const location = await geocodeAddress(address);
-
-      if (!location) {
-        toast.error('Could not locate address. Please try a different format.');
-        setStep('input');
-        setIsLoading(false);
-        return;
-      }
-
-      // Verify it's in Douglas County
-      if (!location.displayName.toLowerCase().includes('douglas')) {
-        toast.error('Address must be in Douglas County, Colorado');
-        setStep('input');
-        setIsLoading(false);
-        return;
-      }
+      // Use coordinates from Google Places (already have them)
+      const { lat, lng, formattedAddress } = addressDetails;
 
       // Fetch elevation data
       toast.info('Getting elevation data...');
-      const altitude = await getElevation(location.lat, location.lon);
+      const altitude = await getElevation(lat, lng);
 
       toast.info('Loading well data...');
       const allWells = await loadWells();
 
       toast.info('Finding nearest wells...');
-      const nearestWells = findNearestWells(location.lat, location.lon, allWells, 10);
+      const nearestWells = findNearestWells(lat, lng, allWells, 10);
 
       toast.info('Generating comprehensive report...');
-      const wellReport = generateWellReport(nearestWells, address, location.lat, location.lon, altitude || undefined);
+      const wellReport = generateWellReport(nearestWells, formattedAddress, lat, lng, altitude || undefined);
 
       setReport(wellReport);
       setStep('report');
@@ -111,6 +106,7 @@ export function WellReportFlow() {
   const handleStartOver = () => {
     setStep('input');
     setAddress('');
+    setAddressDetails(null);
     setPhone('');
     setVerificationCode('');
     setReport(null);
@@ -175,9 +171,10 @@ export function WellReportFlow() {
               <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
                 Property Address
               </label>
-              <AddressAutocomplete
+              <GoogleAddressAutocomplete
                 value={address}
                 onChange={setAddress}
+                onSelectAddress={handleAddressSelect}
                 placeholder="Start typing your address..."
               />
               <p className="text-xs text-gray-500 mt-1">Must be in Douglas County, Colorado</p>

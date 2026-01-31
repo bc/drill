@@ -80,15 +80,51 @@ export function findNearestWells(
   return wellsWithDistance.slice(0, n);
 }
 
+// Cache for well data to avoid repeated fetches
+let wellsCache: Well[] | null = null;
+let wellsCachePromise: Promise<Well[]> | null = null;
+
 /**
- * Load all Douglas County wells from JSON
+ * Load all Douglas County wells from JSON (with caching)
  */
 export async function loadWells(): Promise<Well[]> {
-  const response = await fetch('/data/douglas_county_wells.json');
-  if (!response.ok) {
-    throw new Error('Failed to load well data');
+  // Return cached data if available
+  if (wellsCache) {
+    return wellsCache;
   }
-  return response.json();
+
+  // If a fetch is already in progress, wait for it
+  if (wellsCachePromise) {
+    return wellsCachePromise;
+  }
+
+  // Start new fetch and cache the promise
+  wellsCachePromise = (async (): Promise<Well[]> => {
+    const response = await fetch('/drill/data/douglas_county_wells.json');
+    if (!response.ok) {
+      // Try without base path for local dev
+      const fallbackResponse = await fetch('/data/douglas_county_wells.json');
+      if (!fallbackResponse.ok) {
+        throw new Error('Failed to load well data');
+      }
+      const data: Well[] = await fallbackResponse.json();
+      wellsCache = data;
+      return data;
+    }
+    const data: Well[] = await response.json();
+    wellsCache = data;
+    return data;
+  })();
+
+  return wellsCachePromise;
+}
+
+/**
+ * Clear the wells cache (useful for testing or forced refresh)
+ */
+export function clearWellsCache(): void {
+  wellsCache = null;
+  wellsCachePromise = null;
 }
 
 /**
