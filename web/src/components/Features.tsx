@@ -45,7 +45,7 @@ export function Features() {
   const [activeCard, setActiveCard] = useState<number | null>(null);
 
   return (
-    <div className="py-20 bg-white">
+    <div className="py-20 bg-white" id="features">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl text-gray-900 mb-4">
@@ -58,30 +58,38 @@ export function Features() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
-            <div
+            <button
               key={index}
               onClick={() => setActiveCard(activeCard === index ? null : index)}
-              className="group relative bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all overflow-hidden cursor-pointer"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setActiveCard(activeCard === index ? null : index);
+                }
+              }}
+              className="group relative bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all overflow-hidden cursor-pointer text-left"
+              aria-expanded={activeCard === index}
+              aria-label={`${feature.title}. ${activeCard === index ? 'Press to hide details' : 'Press to show details'}`}
             >
               {/* Image Background */}
               <div className="relative h-48 overflow-hidden">
                 <ImageWithFallback
                   src={feature.image}
-                  alt={feature.title}
+                  alt=""
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                
+
                 {/* Icon overlay */}
                 <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm w-12 h-12 rounded-lg flex items-center justify-center">
-                  <feature.icon className="h-6 w-6 text-blue-600" />
+                  <feature.icon className="h-6 w-6 text-blue-600" aria-hidden="true" />
                 </div>
 
-                {/* Description overlay - appears over image on hover/active */}
+                {/* Description overlay - appears over image on hover/active/focus */}
                 <div className={`absolute inset-0 bg-blue-900/95 backdrop-blur-sm flex items-center justify-center p-6 transition-opacity duration-300 ${
-                  activeCard === index 
-                    ? 'opacity-100' 
-                    : 'opacity-0 md:group-hover:opacity-100 pointer-events-none md:group-hover:pointer-events-auto'
+                  activeCard === index
+                    ? 'opacity-100'
+                    : 'opacity-0 md:group-hover:opacity-100 md:group-focus:opacity-100 pointer-events-none md:group-hover:pointer-events-auto'
                 }`}>
                   <p className="text-white text-center">
                     {feature.description}
@@ -91,9 +99,9 @@ export function Features() {
 
               {/* Content */}
               <div className="p-6">
-                <h3 className="text-xl text-gray-900">{feature.title}</h3>
+                <h3 className="text-xl text-gray-900 font-semibold">{feature.title}</h3>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>

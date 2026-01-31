@@ -27,7 +27,7 @@ const values = [
 
 export function About() {
   return (
-    <div className="py-20 bg-gradient-to-b from-white to-gray-50">
+    <div className="py-20 bg-gradient-to-b from-white to-gray-50" id="about">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
           {/* Left Column - Content */}
@@ -82,8 +82,8 @@ export function About() {
                 <div className="flex items-center gap-3 mb-2">
                   <ColoradoFlag className="w-10 h-10" />
                   <div>
-                    <div className="text-gray-900">Serving All 64 Counties</div>
-                    <div className="text-sm text-gray-600">From the plains to the peaks</div>
+                    <div className="text-gray-900 font-medium">Currently Serving Douglas County</div>
+                    <div className="text-sm text-gray-600">Expanding to more counties soon</div>
                   </div>
                 </div>
               </div>

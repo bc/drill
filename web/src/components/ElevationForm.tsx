@@ -176,25 +176,29 @@ export function ElevationForm() {
             <button
               type="button"
               onClick={() => setContactMethod('email')}
-              className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-sm font-medium transition-colors duration-200 ${
+              className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
                 contactMethod === 'email'
                   ? 'text-gray-900'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
+              aria-pressed={contactMethod === 'email'}
+              aria-label="Contact via email"
             >
-              <Mail className="h-4 w-4" />
+              <Mail className="h-4 w-4" aria-hidden="true" />
               Email
             </button>
             <button
               type="button"
               onClick={() => setContactMethod('phone')}
-              className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-sm font-medium transition-colors duration-200 ${
+              className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
                 contactMethod === 'phone'
                   ? 'text-gray-900'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
+              aria-pressed={contactMethod === 'phone'}
+              aria-label="Contact via phone"
             >
-              <Phone className="h-4 w-4" />
+              <Phone className="h-4 w-4" aria-hidden="true" />
               Phone
             </button>
           </div>
