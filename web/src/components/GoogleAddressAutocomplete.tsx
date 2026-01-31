@@ -2,8 +2,9 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { MapPin, Loader2, X } from 'lucide-react';
 import { Input } from './ui/input';
 
-// Use environment variable for API key, with fallback for development
-const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+// Use environment variable for API key, with fallback for production
+// Note: Client-side API keys are visible in browser - secure via Google Cloud Console domain restrictions
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyAivoYsyHqVIPZyhWHgV7sDvvmXcSF-XFU';
 
 export interface AddressDetails {
   formattedAddress: string;
