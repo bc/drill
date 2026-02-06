@@ -1,107 +1,67 @@
-import { useState } from 'react';
-import { MapPin, Star, DollarSign, FileText, Shield, Clock } from 'lucide-react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { Building2, DollarSign, AlertTriangle, MapPin, Star, Shield } from 'lucide-react';
 
-const features = [
+const reportFeatures = [
+  {
+    icon: Building2,
+    title: 'Local Contractor Profiles',
+    description: 'Detailed profiles of licensed well drilling companies servicing your zip code, including years in business and specializations.',
+  },
+  {
+    icon: DollarSign,
+    title: 'Pricing Estimates',
+    description: 'Cost ranges based on your specific location and estimated well depth, so you know what to expect before getting quotes.',
+  },
+  {
+    icon: AlertTriangle,
+    title: 'Service Limitations',
+    description: 'Know upfront which contractors can handle your specific needs—depth requirements, terrain challenges, or specialty services.',
+  },
   {
     icon: MapPin,
-    title: 'Local Company Directory',
-    description: 'Access a comprehensive database of verified well drilling companies across all Colorado counties.',
-    image: 'https://images.unsplash.com/photo-1754299096126-9d69cde326c4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYXAlMjBsb2NhdGlvbiUyMHBpbnxlbnwxfHx8fDE3NjI5NzcyMzZ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+    title: 'Service Area Coverage',
+    description: 'See exactly which companies service your address, their typical response times, and proximity to your property.',
   },
   {
     icon: Star,
     title: 'Verified Reviews',
-    description: 'Read real reviews from Colorado homeowners who have used these drilling services.',
-    image: 'https://images.unsplash.com/photo-1680824564256-23b8ed3ab519?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmaXZlJTIwc3RhciUyMHJhdGluZ3xlbnwxfHx8fDE3NjI5Nzc4MzV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-  },
-  {
-    icon: DollarSign,
-    title: 'Better Negotiation Power',
-    description: 'Armed with multiple quotes and market data, negotiate the best price for your well drilling project.',
-    image: 'https://images.unsplash.com/photo-1707779491435-000c45820db2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb25leSUyMHNhdmluZ3MlMjBjYWxjdWxhdG9yfGVufDF8fHx8MTc2MzA2ODc2MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-  },
-  {
-    icon: FileText,
-    title: 'Detailed Company Info',
-    description: 'View licensing information, years in business, service areas, and specialties for each company.',
-    image: 'https://images.unsplash.com/photo-1554224155-cfa08c2a758f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMGRvY3VtZW50cyUyMGxpY2Vuc2V8ZW58MXx8fHwxNzYzMDY4NzYzfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+    description: 'Real feedback from Colorado homeowners who have used these services, so you can make an informed decision.',
   },
   {
     icon: Shield,
-    title: 'Licensed & Insured',
-    description: 'All listed companies are verified to have proper Colorado licensing and insurance coverage.',
-    image: 'https://images.unsplash.com/photo-1743623179507-893a90372712?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpbnN1cmFuY2UlMjBzaGllbGQlMjBwcm90ZWN0aW9ufGVufDF8fHx8MTc2MzAzNjM5Mnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-  },
-  {
-    icon: Clock,
-    title: 'Instant Results',
-    description: 'Get matched with qualified well drillers in your area within seconds of entering your zip code.',
-    image: 'https://images.unsplash.com/photo-1761637755336-4191d69eb13b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXN0JTIwc3BlZWQlMjBpbnN0YW50fGVufDF8fHx8MTc2MzA2ODc2NXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+    title: 'License Verification',
+    description: 'Every contractor in our directory is verified for proper Colorado licensing, bonding, and insurance coverage.',
   },
 ];
 
 export function Features() {
-  const [activeCard, setActiveCard] = useState<number | null>(null);
-
   return (
     <div className="py-20 bg-white" id="features">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl text-gray-900 mb-4">
-            Everything You Need to Find the Right Well Driller
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            What's in Your Well Report
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Our comprehensive platform puts all the information you need at your fingertips.
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            A detailed comparison of all well drilling companies servicing your zip code—with pricing estimates, services offered, and limitations clearly explained.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
-            <button
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {reportFeatures.map((feature, index) => (
+            <div
               key={index}
-              onClick={() => setActiveCard(activeCard === index ? null : index)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  setActiveCard(activeCard === index ? null : index);
-                }
-              }}
-              className="group relative bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all overflow-hidden cursor-pointer text-left"
-              aria-expanded={activeCard === index}
-              aria-label={`${feature.title}. ${activeCard === index ? 'Press to hide details' : 'Press to show details'}`}
+              className="p-6 rounded-xl border border-gray-200 hover:border-blue-200 hover:bg-blue-50/50 transition-colors"
             >
-              {/* Image Background */}
-              <div className="relative h-48 overflow-hidden">
-                <ImageWithFallback
-                  src={feature.image}
-                  alt=""
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-
-                {/* Icon overlay */}
-                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm w-12 h-12 rounded-lg flex items-center justify-center">
-                  <feature.icon className="h-6 w-6 text-blue-600" aria-hidden="true" />
+              <div className="flex items-start gap-4">
+                <div className="bg-blue-100 w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <feature.icon className="h-6 w-6 text-blue-600" />
                 </div>
-
-                {/* Description overlay - appears over image on hover/active/focus */}
-                <div className={`absolute inset-0 bg-blue-900/95 backdrop-blur-sm flex items-center justify-center p-6 transition-opacity duration-300 ${
-                  activeCard === index
-                    ? 'opacity-100'
-                    : 'opacity-0 md:group-hover:opacity-100 md:group-focus:opacity-100 pointer-events-none md:group-hover:pointer-events-auto'
-                }`}>
-                  <p className="text-white text-center">
-                    {feature.description}
-                  </p>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">{feature.description}</p>
                 </div>
               </div>
-
-              {/* Content */}
-              <div className="p-6">
-                <h3 className="text-xl text-gray-900 font-semibold">{feature.title}</h3>
-              </div>
-            </button>
+            </div>
           ))}
         </div>
       </div>

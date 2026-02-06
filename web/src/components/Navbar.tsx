@@ -8,9 +8,8 @@ interface NavbarProps {
 }
 
 const navLinks = [
-  { href: '#how-it-works', label: 'How It Works' },
-  { href: '#features', label: 'Features' },
-  { href: '#about', label: 'About' },
+  { href: '#services', label: 'Services' },
+  { href: '#features', label: 'Your Report' },
   { href: '#faq', label: 'FAQ' },
 ];
 
@@ -40,7 +39,7 @@ export function Navbar({ onGetReport }: NavbarProps) {
             aria-label="Go to top"
           >
             <ColoradoFlag className="w-8 h-8" />
-            <span className="text-xl font-bold text-gray-900">Drill</span>
+            <span className="text-xl font-bold text-gray-900">Well Report</span>
           </button>
 
           {/* Desktop Navigation */}
