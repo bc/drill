@@ -114,50 +114,65 @@ export function ElevationForm() {
     await handleFormspreeSubmit(formData);
   };
 
+  const handleUseAsEntered = useCallback(() => {
+    // Clear elevation data when using custom address
+    setElevationResult(null);
+    setElevationError(null);
+    setAddressDetails(null);
+  }, []);
+
   const isFormValid = () => {
-    if (contactMethod === 'email') {
-      return email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && address && elevationResult;
-    } else {
-      return phone && /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test(phone) && address && elevationResult;
-    }
+    const hasContact = contactMethod === 'email'
+      ? email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+      : phone && /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test(phone);
+
+    // Only require address text, not a selected/validated address
+    return hasContact && address.trim().length > 0;
   };
 
   if (formspreeState.succeeded) {
     return (
-      <Card className="p-8 max-w-2xl mx-auto">
-        <div className="text-center py-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-            <CheckCircle2 className="h-8 w-8 text-green-600" />
-          </div>
-          <h3 className="text-2xl font-semibold text-gray-900 mb-2">
-            Analysis Request Received!
-          </h3>
-          <p className="text-gray-600 mb-6">
-            We'll send you a customized report with vetted well drilling contractors in your area, including ratings, experience, and pricing estimates.
-          </p>
-          {elevationResult && (
-            <div className="bg-gray-50 rounded-lg p-4 text-left">
-              <p className="text-sm text-gray-500 mb-2">Your property elevation:</p>
-              <p className="text-2xl font-bold text-blue-600">
-                {elevationResult.elevation.toLocaleString()} feet
-              </p>
+      <div className="max-w-2xl mx-auto">
+        <Card className="p-8 border-2 border-green-200 bg-gradient-to-br from-green-50 to-white shadow-lg">
+          <div className="text-center py-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+              <CheckCircle2 className="h-8 w-8 text-green-600" />
             </div>
-          )}
-        </div>
-      </Card>
+            <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+              Analysis Request Received!
+            </h3>
+            <p className="text-gray-600 mb-6">
+              We'll send you a customized report with vetted well drilling contractors in your area, including ratings, experience, and pricing estimates.
+            </p>
+            {elevationResult && (
+              <div className="bg-white rounded-lg p-4 text-left border border-gray-200">
+                <p className="text-sm text-gray-500 mb-2">Your property elevation:</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {elevationResult.elevation.toLocaleString()} feet
+                </p>
+              </div>
+            )}
+          </div>
+        </Card>
+      </div>
     );
   }
 
   return (
-    <Card className="p-8 max-w-2xl mx-auto">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Get Your Free Well Driller Analysis
-        </h2>
-        <p className="text-gray-600">
-          Enter your address to receive a customized report comparing licensed well drilling contractors in your area—with ratings, pricing estimates, and verified reviews.
-        </p>
-      </div>
+    <div className="max-w-2xl mx-auto">
+      <Card className="p-8 border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white shadow-lg">
+        <div className="mb-8">
+          <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full text-sm font-medium mb-4">
+            <Mountain className="h-4 w-4" />
+            Free Contractor Analysis
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Get Your Customized Report
+          </h2>
+          <p className="text-gray-600">
+            Enter your address to receive a detailed comparison of licensed well drilling contractors in your area—with ratings, pricing estimates, and verified reviews.
+          </p>
+        </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Contact Method Toggle */}
@@ -266,10 +281,11 @@ export function ElevationForm() {
             value={address}
             onChange={setAddress}
             onSelectAddress={handleAddressSelect}
+            onUseAsEntered={handleUseAsEntered}
             placeholder="Start typing your address..."
           />
           <p className="text-xs text-gray-500 mt-1">
-            Select an address from the dropdown to see your elevation
+            Select from suggestions or use your address as entered
           </p>
         </div>
 
@@ -386,6 +402,7 @@ export function ElevationForm() {
           We connect you with vetted contractors—we do not provide drilling services directly.
         </p>
       </form>
-    </Card>
+      </Card>
+    </div>
   );
 }

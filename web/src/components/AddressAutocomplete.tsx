@@ -33,6 +33,7 @@ interface AddressAutocompleteProps {
   value: string;
   onChange: (value: string) => void;
   onSelectAddress?: (details: AddressDetails) => void;
+  onUseAsEntered?: () => void;
   placeholder?: string;
   className?: string;
 }
@@ -41,6 +42,7 @@ export function AddressAutocomplete({
   value,
   onChange,
   onSelectAddress,
+  onUseAsEntered,
   placeholder = "Start typing your address...",
   className = "",
 }: AddressAutocompleteProps) {
@@ -91,7 +93,7 @@ export function AddressAutocomplete({
 
         const results: NominatimResult[] = await response.json();
         setSuggestions(results);
-        setShowDropdown(results.length > 0);
+        setShowDropdown(true); // Always show dropdown when searching
         setSelectedIndex(-1);
       } catch (error) {
         if ((error as Error).name !== 'AbortError') {
@@ -147,13 +149,22 @@ export function AddressAutocomplete({
     setSuggestions([]);
   }, [onChange, onSelectAddress]);
 
+  const handleUseAsEntered = useCallback(() => {
+    onUseAsEntered?.();
+    setShowDropdown(false);
+    setSuggestions([]);
+  }, [onUseAsEntered]);
+
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (!showDropdown || suggestions.length === 0) return;
+    if (!showDropdown) return;
+
+    // Total options = suggestions + 1 for "use as entered"
+    const totalOptions = suggestions.length + 1;
 
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setSelectedIndex((prev) => Math.min(prev + 1, suggestions.length - 1));
+        setSelectedIndex((prev) => Math.min(prev + 1, totalOptions - 1));
         break;
       case 'ArrowUp':
         e.preventDefault();
@@ -163,13 +174,15 @@ export function AddressAutocomplete({
         e.preventDefault();
         if (selectedIndex >= 0 && selectedIndex < suggestions.length) {
           handleSelect(suggestions[selectedIndex]);
+        } else if (selectedIndex === suggestions.length) {
+          handleUseAsEntered();
         }
         break;
       case 'Escape':
         setShowDropdown(false);
         break;
     }
-  }, [showDropdown, suggestions, selectedIndex, handleSelect]);
+  }, [showDropdown, suggestions, selectedIndex, handleSelect, handleUseAsEntered]);
 
   const handleClear = useCallback(() => {
     onChange('');
@@ -213,7 +226,7 @@ export function AddressAutocomplete({
       </div>
 
       {/* Suggestions Dropdown */}
-      {showDropdown && suggestions.length > 0 && (
+      {showDropdown && value.length >= 3 && (
         <div
           ref={dropdownRef}
           id="address-suggestions"
@@ -228,7 +241,7 @@ export function AddressAutocomplete({
               aria-selected={index === selectedIndex}
               onClick={() => handleSelect(result)}
               onMouseEnter={() => setSelectedIndex(index)}
-              className={`w-full px-4 py-3 text-left text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0 ${
+              className={`w-full px-4 py-3 text-left text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 ${
                 index === selectedIndex ? 'bg-blue-50' : ''
               }`}
             >
@@ -238,6 +251,25 @@ export function AddressAutocomplete({
               </div>
             </button>
           ))}
+          {/* Use as entered option */}
+          <button
+            type="button"
+            role="option"
+            aria-selected={selectedIndex === suggestions.length}
+            onClick={handleUseAsEntered}
+            onMouseEnter={() => setSelectedIndex(suggestions.length)}
+            className={`w-full px-4 py-3 text-left text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-t border-gray-200 ${
+              selectedIndex === suggestions.length ? 'bg-blue-50' : ''
+            }`}
+          >
+            <div className="flex items-start gap-2">
+              <MapPin className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <span className="text-blue-600 font-medium">Use as entered: </span>
+                <span className="text-gray-700">{value}</span>
+              </div>
+            </div>
+          </button>
         </div>
       )}
     </div>
