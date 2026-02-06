@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
 import { Mail, Phone, Loader2, Mountain, Droplets, CheckCircle2, AlertCircle } from 'lucide-react';
-import { GoogleAddressAutocomplete, type AddressDetails } from './GoogleAddressAutocomplete';
+import { AddressAutocomplete, type AddressDetails } from './AddressAutocomplete';
 import { getReservoirsForZipCode, compareElevations, type Reservoir } from '../lib/reservoirData';
 import { getElevation } from '../lib/wellData';
 
@@ -262,7 +262,7 @@ export function ElevationForm() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Property Address
           </label>
-          <GoogleAddressAutocomplete
+          <AddressAutocomplete
             value={address}
             onChange={setAddress}
             onSelectAddress={handleAddressSelect}
