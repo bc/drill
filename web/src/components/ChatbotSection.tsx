@@ -1,30 +1,42 @@
 import { useState } from 'react';
-import { HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { HelpCircle, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 
 const faqs = [
   {
     question: 'What permits do I need for well drilling in Colorado?',
-    answer: 'In Colorado, you need a well permit from the Colorado Division of Water Resources before drilling. The permit ensures your well complies with state water laws and won\'t interfere with existing water rights. Douglas County may also require additional local permits. The permitting process typically takes 2-4 weeks.',
+    answer: 'You must obtain a well permit from the Colorado Division of Water Resources (DWR) before drilling any groundwater well in Colorado. Most private domestic wells are "exempt" from the priority system and don\'t require augmentation. Exempt wells are limited to 15 gallons per minute and require non-evaporative wastewater systems. The two most common types are Household-Use Only wells and Domestic and Livestock wells. Well permits issued after May 8, 1972 on properties under 35 acres are typically permitted for household-use only—water can only be used inside the home.',
+    source: 'Colorado Division of Water Resources',
+    sourceUrl: 'https://dwr.colorado.gov/services/well-permitting',
   },
   {
-    question: 'How much does it cost to drill a well in Douglas County?',
-    answer: 'Well drilling costs in Douglas County typically range from $15-$30 per foot, depending on ground conditions and depth. Most residential wells are 300-500 feet deep, putting total drilling costs between $4,500-$15,000. Additional costs include the pump ($1,500-$3,000), pressure tank, and hookup which can add $3,000-$5,000.',
+    question: 'How much does it cost to drill a well in Colorado?',
+    answer: 'Well drilling costs in Colorado range from $28 to $62+ per foot, depending on location and geology. Mountain wells in hard rock (granite, gneiss) cost more, while Eastern Plains wells in sand/gravel are less expensive. A complete private well system typically costs $10,000 to $50,000, depending on depth. Well permits cost $500 to $1,200 through the Colorado Division of Water Resources. Additional costs include pump installation ($1,500-$3,000), pressure tank, and hookup.',
+    source: 'HomeGuide & Land Limited',
+    sourceUrl: 'https://homeguide.com/costs/well-drilling-cost',
   },
   {
     question: 'How long does well drilling take?',
-    answer: 'The actual drilling typically takes 1-3 days for a residential well. However, the complete process from permit application to a functioning well usually takes 4-8 weeks. This includes permitting (2-4 weeks), scheduling (1-2 weeks), drilling (1-3 days), and pump installation (1-2 days).',
+    answer: 'The complete process from permit to potable water takes 2 to 4 months. The Colorado DWR reviews permit applications in the order received, with complete applications taking up to 49 days (about 7 weeks). The drilling phase lasts 1 to 3 weeks depending on depth and geological conditions. Completion and testing require another 1 to 2 weeks for casing and pump installation. Within 60 days of completion, your contractor must submit a Well Construction and Yield Estimate Report to the DWR.',
+    source: 'Colorado Division of Water Resources',
+    sourceUrl: 'https://dwr.colorado.gov/services/well-permitting',
   },
   {
     question: 'What water quality testing is required?',
-    answer: 'Colorado requires testing for coliform bacteria before a well can be used for drinking water. Additional recommended tests include nitrates, pH, hardness, and common contaminants. Many homeowners also test for arsenic and uranium, which can occur naturally in Colorado groundwater. Testing typically costs $100-$300.',
+    answer: 'Colorado has no state regulations requiring private well water testing—private water supplies are not regulated by local or state agencies. However, the EPA and Colorado Department of Public Health recommend testing annually for coliform bacteria and nitrates. In some counties, testing is mandatory for real estate transactions. The standard is less than one coliform bacterium per 100mL. If bacteria are detected, do not consume the water until a follow-up test confirms it\'s safe. Testing costs $100-$350 depending on what\'s included.',
+    source: 'Jefferson County & CDPHE',
+    sourceUrl: 'https://www.jeffco.us/4676/Mandatory-Well-Water-Quality-Testing-Req',
   },
   {
     question: 'How deep will my well need to be?',
-    answer: 'Well depth in Douglas County varies significantly by location. Most residential wells range from 200-600 feet, with some areas requiring depths over 800 feet. Our elevation report helps you understand what nearby wells have found, giving you a better estimate for your specific location.',
+    answer: 'Well depth in Douglas County varies significantly by location, typically ranging from 200 to 800+ feet. The Dawson aquifer (shallowest, commonly used for domestic wells) has a maximum depth of about 600 feet. The Denver aquifer reaches approximately 1,300 feet, the Arapahoe up to 1,700 feet, and the Laramie-Fox Hills (deepest) can exceed 2,400 feet. Your required depth depends on which aquifer you\'re accessing and your specific location within the county.',
+    source: 'Douglas County Government',
+    sourceUrl: 'https://www.douglas.co.us/planning/water-resources/denver-basin-aquifer-info/',
   },
   {
     question: 'What aquifers are available in Douglas County?',
-    answer: 'Douglas County sits above several aquifers including the Denver Basin aquifers: Dawson, Denver, Arapahoe, and Laramie-Fox Hills. The Dawson is typically the shallowest (100-400 ft) while Laramie-Fox Hills is deepest (1,000+ ft). Your well report will show which aquifers nearby wells have tapped.',
+    answer: 'Douglas County sits above the Denver Basin, composed of four major bedrock aquifers stacked on top of each other. From shallowest to deepest: the Dawson aquifer (400-1,200 ft thick, max depth ~600 ft), the Denver aquifer (800-1,000 ft thick, max depth ~1,300 ft), the Arapahoe aquifer (up to 400 ft thick, max depth ~1,700 ft), and the Laramie-Fox Hills aquifer (up to 350 ft thick, max depth ~2,400 ft). The Dawson is most commonly tapped by domestic wells due to its shallow depth.',
+    source: 'USGS & Douglas County',
+    sourceUrl: 'https://www.usgs.gov/mission-areas/water-resources/science/denver-basin-aquifer-system',
   },
 ];
 
@@ -46,7 +58,7 @@ export function ChatbotSection() {
             Frequently Asked Questions
           </h2>
           <p className="text-lg text-gray-600">
-            Everything you need to know about well drilling in Douglas County
+            Expert answers about well drilling in Colorado, backed by official sources
           </p>
         </div>
 
@@ -72,11 +84,22 @@ export function ChatbotSection() {
               <div
                 id={`faq-answer-${index}`}
                 className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                  openIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                  openIndex === index ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
                 }`}
               >
-                <div className="px-6 pb-5 text-gray-600 leading-relaxed">
-                  {faq.answer}
+                <div className="px-6 pb-5">
+                  <p className="text-gray-600 leading-relaxed mb-4">
+                    {faq.answer}
+                  </p>
+                  <a
+                    href={faq.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    <span>Source: {faq.source}</span>
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
                 </div>
               </div>
             </div>
