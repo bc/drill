@@ -17,8 +17,9 @@ export function Hero() {
           </h1>
 
           <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            We started this service because we saw our neighbors and friends struggle to find reliable well drilling companies.
-            The process was opaque, prices varied wildly, and it was hard to know who to trust with such an important investment.
+            We started this service because we saw our neighbors struggle to find reliable well drilling companies.
+            The process was opaque, prices varied wildly, and it was hard to know who to trust. We don't drill wells—we
+            aggregate ratings, experience data, and verified reviews so you can make an informed decision.
           </p>
         </div>
 

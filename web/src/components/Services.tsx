@@ -4,7 +4,7 @@ const services = [
   {
     icon: Drill,
     title: 'Well Drilling',
-    description: 'Complete residential and commercial well drilling services. Our vetted contractors handle everything from permit applications to pump installation, with depths ranging from 200 to 800+ feet depending on your location.',
+    description: 'Compare licensed well drillers in your area. We track contractor experience with different depths (200–800+ ft), permit success rates, and customer satisfaction scores.',
     details: [
       'New well construction',
       'Replacement wells',
@@ -15,7 +15,7 @@ const services = [
   {
     icon: Droplets,
     title: 'Treatment & Purification',
-    description: 'Ensure your well water is safe and clean with professional water treatment services. From basic filtration to complete purification systems, protect your family from contaminants.',
+    description: 'Find water treatment specialists with verified reviews. Our database includes contractors offering filtration, UV disinfection, and purification systems.',
     details: [
       'Water quality testing',
       'Filtration systems',
@@ -26,7 +26,7 @@ const services = [
   {
     icon: Settings,
     title: 'Pump Maintenance',
-    description: 'Keep your well system running efficiently with regular maintenance and repair services. Annual inspections extend pump life and prevent costly emergency repairs.',
+    description: 'Locate pump service technicians with proven track records. We monitor response times, repair success rates, and pricing transparency across providers.',
     details: [
       'Annual inspections',
       'Pump repair & replacement',
@@ -42,10 +42,10 @@ export function Services() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-            Services Our Network Provides
+            Find Contractors for These Services
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Your well report includes a detailed comparison of licensed contractors in your area offering these services.
+            We track ratings, experience, and pricing data on contractors offering these services. Your report compares options in your area.
           </p>
         </div>
 
