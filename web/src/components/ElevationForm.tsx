@@ -130,10 +130,10 @@ export function ElevationForm() {
             <CheckCircle2 className="h-8 w-8 text-green-600" />
           </div>
           <h3 className="text-2xl font-semibold text-gray-900 mb-2">
-            Report Submitted!
+            Analysis Request Received!
           </h3>
           <p className="text-gray-600 mb-6">
-            Thank you for your interest. We'll be in touch soon with your detailed well drilling assessment.
+            We'll send you a customized report with vetted well drilling contractors in your area, including ratings, experience, and pricing estimates.
           </p>
           {elevationResult && (
             <div className="bg-gray-50 rounded-lg p-4 text-left">
@@ -152,10 +152,10 @@ export function ElevationForm() {
     <Card className="p-8 max-w-2xl mx-auto">
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Get Your Free Elevation Report
+          Get Your Free Well Driller Analysis
         </h2>
         <p className="text-gray-600">
-          Enter your address to see your property elevation and how it compares to nearby water reservoirs.
+          Enter your address to receive a customized report comparing licensed well drilling contractors in your area—with ratings, pricing estimates, and verified reviews.
         </p>
       </div>
 
@@ -383,7 +383,7 @@ export function ElevationForm() {
         </Button>
 
         <p className="text-xs text-center text-gray-500">
-          By submitting, you agree to receive communications about your well drilling assessment.
+          We connect you with vetted contractors—we do not provide drilling services directly.
         </p>
       </form>
     </Card>

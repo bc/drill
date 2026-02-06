@@ -39,10 +39,10 @@ export function Features() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-            What's in Your Well Report
+            What's in Your Contractor Analysis
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            A detailed comparison of all well drilling companies servicing your zip code—with pricing estimates, services offered, and limitations clearly explained.
+            A customized comparison of well drilling companies servicing your location—with aggregated ratings, pricing data, and verified reviews from our database.
           </p>
         </div>
 
