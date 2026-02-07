@@ -35,6 +35,7 @@ export function ElevationForm() {
   const [elevationResult, setElevationResult] = useState<ElevationResult | null>(null);
   const [isLoadingElevation, setIsLoadingElevation] = useState(false);
   const [elevationError, setElevationError] = useState<string | null>(null);
+  const [showResults, setShowResults] = useState(false);
 
   const handleAddressSelect = useCallback(async (details: AddressDetails) => {
     setAddressDetails(details);
@@ -112,160 +113,34 @@ export function ElevationForm() {
 
     // Submit to Formspree
     await handleFormspreeSubmit(formData);
+    setShowResults(true);
   };
 
   const isFormValid = () => {
     if (contactMethod === 'email') {
-      return email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && address && elevationResult;
+      return email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && addressDetails;
     } else {
-      return phone && /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test(phone) && address && elevationResult;
+      return phone && /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test(phone) && addressDetails;
     }
   };
 
-  if (formspreeState.succeeded) {
+  if (formspreeState.succeeded || showResults) {
     return (
       <Card className="p-8 max-w-2xl mx-auto">
-        <div className="text-center py-8">
+        <div className="text-center py-6 mb-4">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
             <CheckCircle2 className="h-8 w-8 text-green-600" />
           </div>
           <h3 className="text-2xl font-semibold text-gray-900 mb-2">
             Analysis Request Received!
           </h3>
-          <p className="text-gray-600 mb-6">
-            We'll send you a customized report with vetted well drilling contractors in your area, including ratings, experience, and pricing estimates.
-          </p>
-          {elevationResult && (
-            <div className="bg-gray-50 rounded-lg p-4 text-left">
-              <p className="text-sm text-gray-500 mb-2">Your property elevation:</p>
-              <p className="text-2xl font-bold text-blue-600">
-                {elevationResult.elevation.toLocaleString()} feet
-              </p>
-            </div>
-          )}
-        </div>
-      </Card>
-    );
-  }
-
-  return (
-    <Card className="p-8 max-w-2xl mx-auto">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Get Your Free Well Driller Analysis
-        </h2>
-        <p className="text-gray-600">
-          Enter your address to receive a customized report comparing licensed well drilling contractors in your area—with ratings, pricing estimates, and verified reviews.
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Contact Input */}
-        <div>
-          <div
-            className={`transition-all duration-300 ease-out ${
-              contactMethod === 'email'
-                ? 'opacity-100 translate-x-0 h-auto'
-                : 'opacity-0 -translate-x-4 h-0 overflow-hidden'
-            }`}
-          >
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <Input
-                id="email"
-                type="email"
-                name="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="text-base pl-10"
-              />
-            </div>
-            <ValidationError prefix="Email" field="email" errors={formspreeState.errors} />
-            <button
-              type="button"
-              onClick={() => setContactMethod('phone')}
-              className="mt-2 inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
-            >
-              <Smartphone className="h-3.5 w-3.5" />
-              Get it via SMS / iMessage instead
-            </button>
-          </div>
-
-          <div
-            className={`transition-all duration-300 ease-out ${
-              contactMethod === 'phone'
-                ? 'opacity-100 translate-x-0 h-auto'
-                : 'opacity-0 translate-x-4 h-0 overflow-hidden'
-            }`}
-          >
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-              Phone Number
-            </label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <Input
-                id="phone"
-                type="tel"
-                name="phone"
-                placeholder="(303) 555-1234"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="text-base pl-10"
-              />
-            </div>
-            <ValidationError prefix="Phone" field="phone" errors={formspreeState.errors} />
-            <button
-              type="button"
-              onClick={() => setContactMethod('email')}
-              className="mt-2 inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
-            >
-              <Mail className="h-3.5 w-3.5" />
-              Get it via email instead
-            </button>
-          </div>
-        </div>
-
-        {/* Address Input */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Property Address
-          </label>
-          <AddressAutocomplete
-            value={address}
-            onChange={setAddress}
-            onSelectAddress={handleAddressSelect}
-            placeholder="Start typing your address..."
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            Select an address from the dropdown to see your elevation
+          <p className="text-gray-600">
+            We'll send your customized report with vetted well drilling contractors in your area, including ratings, experience, and pricing estimates.
           </p>
         </div>
 
-        {/* Loading State */}
-        {isLoadingElevation && (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-8 w-8 text-blue-600 animate-spin mr-3" />
-            <span className="text-gray-600">Fetching elevation data...</span>
-          </div>
-        )}
-
-        {/* Error State */}
-        {elevationError && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm font-medium text-red-800">Unable to get elevation</p>
-              <p className="text-sm text-red-600">{elevationError}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Elevation Results */}
-        {elevationResult && !isLoadingElevation && (
+        {/* Show elevation results after submission */}
+        {elevationResult && (
           <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Main Elevation Display */}
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
@@ -333,6 +208,140 @@ export function ElevationForm() {
                 pumping requirements, and well drilling considerations. Properties at higher
                 elevations may require additional infrastructure for water delivery.
               </p>
+            </div>
+          </div>
+        )}
+
+        {isLoadingElevation && (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-8 w-8 text-blue-600 animate-spin mr-3" />
+            <span className="text-gray-600">Loading elevation data...</span>
+          </div>
+        )}
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="p-8 max-w-2xl mx-auto">
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Get Your Free Well Driller Analysis
+        </h2>
+        <p className="text-gray-600">
+          Enter your address to receive a customized report comparing licensed well drilling contractors in your area—with ratings, pricing estimates, and verified reviews.
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Contact Input */}
+        <div>
+          <div
+            className={`transition-all duration-300 ease-out ${
+              contactMethod === 'email'
+                ? 'opacity-100 translate-x-0 h-auto'
+                : 'opacity-0 -translate-x-4 h-0 overflow-hidden'
+            }`}
+          >
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              Email Address
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Input
+                id="email"
+                type="email"
+                name="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="text-base pl-10"
+              />
+            </div>
+            <ValidationError prefix="Email" field="email" errors={formspreeState.errors} />
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={() => setContactMethod('phone')}
+              className="mt-2 inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            >
+              <Smartphone className="h-3.5 w-3.5" />
+              Get it via SMS / iMessage instead
+            </button>
+          </div>
+
+          <div
+            className={`transition-all duration-300 ease-out ${
+              contactMethod === 'phone'
+                ? 'opacity-100 translate-x-0 h-auto'
+                : 'opacity-0 translate-x-4 h-0 overflow-hidden'
+            }`}
+          >
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+              Phone Number
+            </label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Input
+                id="phone"
+                type="tel"
+                name="phone"
+                placeholder="(303) 555-1234"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="text-base pl-10"
+              />
+            </div>
+            <ValidationError prefix="Phone" field="phone" errors={formspreeState.errors} />
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={() => setContactMethod('email')}
+              className="mt-2 inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            >
+              <Mail className="h-3.5 w-3.5" />
+              Get it via email instead
+            </button>
+          </div>
+        </div>
+
+        {/* Address Input */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Property Address
+          </label>
+          <AddressAutocomplete
+            value={address}
+            onChange={setAddress}
+            onSelectAddress={handleAddressSelect}
+            placeholder="Start typing your address..."
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Select an address from the dropdown to see your elevation
+          </p>
+        </div>
+
+        {/* Address validation feedback */}
+        {addressDetails && !isLoadingElevation && !elevationError && (
+          <div className="flex items-center gap-2 text-sm text-green-600">
+            <CheckCircle2 className="h-4 w-4" />
+            <span>Address verified</span>
+          </div>
+        )}
+
+        {isLoadingElevation && (
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span>Verifying address...</span>
+          </div>
+        )}
+
+        {elevationError && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-red-800">Unable to verify address</p>
+              <p className="text-sm text-red-600">{elevationError}</p>
             </div>
           </div>
         )}

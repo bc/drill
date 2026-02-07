@@ -111,6 +111,7 @@ export function SupportCTA() {
                 <ValidationError prefix="Email" field="email" errors={formspreeState.errors} />
                 <button
                   type="button"
+                  tabIndex={-1}
                   onClick={() => setContactMethod('phone')}
                   className="mt-2 inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
                 >
@@ -144,6 +145,7 @@ export function SupportCTA() {
                 <ValidationError prefix="Phone" field="phone" errors={formspreeState.errors} />
                 <button
                   type="button"
+                  tabIndex={-1}
                   onClick={() => setContactMethod('email')}
                   className="mt-2 inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
                 >
