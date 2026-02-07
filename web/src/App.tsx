@@ -5,6 +5,7 @@ import { Services } from './components/Services';
 import { Features } from './components/Features';
 import { ChatbotSection } from './components/ChatbotSection';
 import { Footer } from './components/Footer';
+import { SupportCTA } from './components/SupportCTA';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
         <Services />
         <Features />
         <ChatbotSection />
+        <SupportCTA />
         <Footer />
       </div>
     </ErrorBoundary>
