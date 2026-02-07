@@ -11,6 +11,7 @@ const navLinks = [
   { href: '#services', label: 'Services' },
   { href: '#features', label: 'Your Report' },
   { href: '#faq', label: 'FAQ' },
+  { href: '#support', label: 'Get Help' },
 ];
 
 export function Navbar({ onGetReport }: NavbarProps) {

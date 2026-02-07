@@ -3,7 +3,7 @@ import { useForm, ValidationError } from '@formspree/react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
-import { Mail, Phone, Loader2, Mountain, Droplets, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Mail, Phone, Smartphone, Loader2, Mountain, Droplets, CheckCircle2, AlertCircle } from 'lucide-react';
 import { AddressAutocomplete, type AddressDetails } from './AddressAutocomplete';
 import { getReservoirsForZipCode, compareElevations, type Reservoir } from '../lib/reservoirData';
 import { getElevation } from '../lib/wellData';
@@ -160,52 +160,8 @@ export function ElevationForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Contact Method Toggle */}
+        {/* Contact Input */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">
-            How should we contact you?
-          </label>
-          <div className="relative bg-gray-100 rounded-lg p-1 flex">
-            {/* Animated background */}
-            <div
-              className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-md shadow-sm transition-all duration-300 ease-out"
-              style={{
-                left: contactMethod === 'email' ? '4px' : 'calc(50% + 0px)',
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => setContactMethod('email')}
-              className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
-                contactMethod === 'email'
-                  ? 'text-gray-900'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-              aria-pressed={contactMethod === 'email'}
-              aria-label="Contact via email"
-            >
-              <Mail className="h-4 w-4" aria-hidden="true" />
-              Email
-            </button>
-            <button
-              type="button"
-              onClick={() => setContactMethod('phone')}
-              className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
-                contactMethod === 'phone'
-                  ? 'text-gray-900'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-              aria-pressed={contactMethod === 'phone'}
-              aria-label="Contact via phone"
-            >
-              <Phone className="h-4 w-4" aria-hidden="true" />
-              Phone
-            </button>
-          </div>
-        </div>
-
-        {/* Contact Input - Animated Transition */}
-        <div className="relative overflow-hidden">
           <div
             className={`transition-all duration-300 ease-out ${
               contactMethod === 'email'
@@ -229,6 +185,14 @@ export function ElevationForm() {
               />
             </div>
             <ValidationError prefix="Email" field="email" errors={formspreeState.errors} />
+            <button
+              type="button"
+              onClick={() => setContactMethod('phone')}
+              className="mt-2 inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            >
+              <Smartphone className="h-3.5 w-3.5" />
+              Get it via SMS / iMessage instead
+            </button>
           </div>
 
           <div
@@ -254,6 +218,14 @@ export function ElevationForm() {
               />
             </div>
             <ValidationError prefix="Phone" field="phone" errors={formspreeState.errors} />
+            <button
+              type="button"
+              onClick={() => setContactMethod('email')}
+              className="mt-2 inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            >
+              <Mail className="h-3.5 w-3.5" />
+              Get it via email instead
+            </button>
           </div>
         </div>
 
