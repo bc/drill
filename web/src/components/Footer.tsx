@@ -9,7 +9,7 @@ export function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <ColoradoFlag className="w-6 h-6" />
-              <span className="text-white text-xl font-semibold">Drill</span>
+              <span className="text-white text-xl font-semibold">Well Report Co</span>
             </div>
             <p className="text-sm text-gray-400">
               Comprehensive well drilling reports and expert guidance for Douglas County property owners.
@@ -29,7 +29,7 @@ export function Footer() {
         </div>
 
         <div className="pt-8 border-t border-gray-800 text-center text-sm text-gray-400">
-          <p>&copy; {new Date().getFullYear()} Drill. Free well drilling reports for Colorado homeowners.</p>
+          <p>&copy; {new Date().getFullYear()} Well Report Co. Free well drilling reports for Colorado homeowners.</p>
         </div>
       </div>
     </footer>
