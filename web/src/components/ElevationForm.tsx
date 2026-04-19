@@ -1,10 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useForm, ValidationError } from '@formspree/react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
-import { Mail, Phone, Smartphone, Loader2, Mountain, Droplets, CheckCircle2, AlertCircle } from 'lucide-react';
-import { AddressAutocomplete, type AddressDetails } from './AddressAutocomplete';
+import { Mail, Phone, Smartphone, MapPin, Loader2, Mountain, Droplets, CheckCircle2 } from 'lucide-react';
 import { getReservoirsForZipCode, compareElevations, type Reservoir } from '../lib/reservoirData';
 import { getElevation } from '../lib/wellData';
 
@@ -25,64 +24,46 @@ interface ElevationResult {
   }[];
 }
 
+async function geocodeZipCode(zipCode: string): Promise<{ lat: number; lng: number; displayName: string } | null> {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?` +
+        new URLSearchParams({
+          postalcode: zipCode,
+          country: 'us',
+          format: 'json',
+          limit: '1',
+        }),
+      { headers: { 'Accept': 'application/json' } }
+    );
+    if (!response.ok) return null;
+    const results = await response.json();
+    if (results.length === 0) return null;
+    return {
+      lat: parseFloat(results[0].lat),
+      lng: parseFloat(results[0].lon),
+      displayName: results[0].display_name,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export function ElevationForm() {
   const [formspreeState, handleFormspreeSubmit] = useForm("mykjoqzw");
   const [contactMethod, setContactMethod] = useState<ContactMethod>('email');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [addressDetails, setAddressDetails] = useState<AddressDetails | null>(null);
+  const [zipCode, setZipCode] = useState('');
   const [elevationResult, setElevationResult] = useState<ElevationResult | null>(null);
   const [isLoadingElevation, setIsLoadingElevation] = useState(false);
-  const [elevationError, setElevationError] = useState<string | null>(null);
-
-  const handleAddressSelect = useCallback(async (details: AddressDetails) => {
-    setAddressDetails(details);
-    setElevationError(null);
-    setIsLoadingElevation(true);
-
-    try {
-      // Get elevation from API
-      const elevation = await getElevation(details.lat, details.lng);
-
-      if (elevation === null) {
-        setElevationError('Could not retrieve elevation data. Please try again.');
-        setElevationResult(null);
-        return;
-      }
-
-      // Get reservoirs for this zip code
-      const { zoneName, reservoirs } = getReservoirsForZipCode(details.zipCode);
-
-      // Compare elevations
-      const comparisons = compareElevations(elevation, reservoirs);
-
-      setElevationResult({
-        elevation,
-        address: details.formattedAddress,
-        zipCode: details.zipCode,
-        lat: details.lat,
-        lng: details.lng,
-        zoneName,
-        reservoirs,
-        comparisons,
-      });
-    } catch (error) {
-      console.error('Error getting elevation:', error);
-      setElevationError('Failed to retrieve elevation data. Please try again.');
-      setElevationResult(null);
-    } finally {
-      setIsLoadingElevation(false);
-    }
-  }, []);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Build form data to send to Formspree
     const formData = new FormData();
 
-    // Contact info
     if (contactMethod === 'email') {
       formData.append('email', email);
       formData.append('contact_method', 'email');
@@ -91,190 +72,71 @@ export function ElevationForm() {
       formData.append('contact_method', 'phone');
     }
 
-    // Address info
-    formData.append('address', address);
-    if (addressDetails) {
-      formData.append('zip_code', addressDetails.zipCode);
-      formData.append('city', addressDetails.city);
-      formData.append('state', addressDetails.state);
-      formData.append('latitude', addressDetails.lat.toString());
-      formData.append('longitude', addressDetails.lng.toString());
-    }
+    formData.append('zip_code', zipCode.trim());
 
-    // Elevation info
-    if (elevationResult) {
-      formData.append('elevation_feet', elevationResult.elevation.toString());
-      formData.append('zone_name', elevationResult.zoneName);
-      formData.append('reservoirs', elevationResult.reservoirs.map(r =>
-        `${r.name}: ${r.elevation.toLocaleString()} ft`
-      ).join('; '));
-    }
-
-    // Submit to Formspree
     await handleFormspreeSubmit(formData);
+    setSubmitted(true);
+
+    setIsLoadingElevation(true);
+    try {
+      const geo = await geocodeZipCode(zipCode.trim());
+      if (geo) {
+        const elevation = await getElevation(geo.lat, geo.lng);
+        if (elevation !== null) {
+          const { zoneName, reservoirs } = getReservoirsForZipCode(zipCode.trim());
+          const comparisons = compareElevations(elevation, reservoirs);
+          setElevationResult({
+            elevation,
+            address: geo.displayName,
+            zipCode: zipCode.trim(),
+            lat: geo.lat,
+            lng: geo.lng,
+            zoneName,
+            reservoirs,
+            comparisons,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error enriching with elevation:', error);
+    } finally {
+      setIsLoadingElevation(false);
+    }
   };
 
   const isFormValid = () => {
+    const hasZip = /^\d{5}$/.test(zipCode.trim());
     if (contactMethod === 'email') {
-      return email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && address && elevationResult;
+      return email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && hasZip;
     } else {
-      return phone && /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test(phone) && address && elevationResult;
+      return phone && /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test(phone) && hasZip;
     }
   };
 
-  if (formspreeState.succeeded) {
+  if (formspreeState.succeeded || submitted) {
     return (
       <Card className="p-8 max-w-2xl mx-auto">
-        <div className="text-center py-8">
+        <div className="text-center py-6 mb-4">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
             <CheckCircle2 className="h-8 w-8 text-green-600" />
           </div>
           <h3 className="text-2xl font-semibold text-gray-900 mb-2">
             Analysis Request Received!
           </h3>
-          <p className="text-gray-600 mb-6">
-            We'll send you a customized report with vetted well drilling contractors in your area, including ratings, experience, and pricing estimates.
-          </p>
-          {elevationResult && (
-            <div className="bg-gray-50 rounded-lg p-4 text-left">
-              <p className="text-sm text-gray-500 mb-2">Your property elevation:</p>
-              <p className="text-2xl font-bold text-blue-600">
-                {elevationResult.elevation.toLocaleString()} feet
-              </p>
-            </div>
-          )}
-        </div>
-      </Card>
-    );
-  }
-
-  return (
-    <Card className="p-8 max-w-2xl mx-auto">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Get Your Free Well Driller Analysis
-        </h2>
-        <p className="text-gray-600">
-          Enter your address to receive a customized report comparing licensed well drilling contractors in your area—with ratings, pricing estimates, and verified reviews.
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Contact Input */}
-        <div>
-          <div
-            className={`transition-all duration-300 ease-out ${
-              contactMethod === 'email'
-                ? 'opacity-100 translate-x-0 h-auto'
-                : 'opacity-0 -translate-x-4 h-0 overflow-hidden'
-            }`}
-          >
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <Input
-                id="email"
-                type="email"
-                name="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="text-base pl-10"
-              />
-            </div>
-            <ValidationError prefix="Email" field="email" errors={formspreeState.errors} />
-            <button
-              type="button"
-              onClick={() => setContactMethod('phone')}
-              className="mt-2 inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
-            >
-              <Smartphone className="h-3.5 w-3.5" />
-              Get it via SMS / iMessage instead
-            </button>
-          </div>
-
-          <div
-            className={`transition-all duration-300 ease-out ${
-              contactMethod === 'phone'
-                ? 'opacity-100 translate-x-0 h-auto'
-                : 'opacity-0 translate-x-4 h-0 overflow-hidden'
-            }`}
-          >
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-              Phone Number
-            </label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <Input
-                id="phone"
-                type="tel"
-                name="phone"
-                placeholder="(303) 555-1234"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="text-base pl-10"
-              />
-            </div>
-            <ValidationError prefix="Phone" field="phone" errors={formspreeState.errors} />
-            <button
-              type="button"
-              onClick={() => setContactMethod('email')}
-              className="mt-2 inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
-            >
-              <Mail className="h-3.5 w-3.5" />
-              Get it via email instead
-            </button>
-          </div>
-        </div>
-
-        {/* Address Input */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Property Address
-          </label>
-          <AddressAutocomplete
-            value={address}
-            onChange={setAddress}
-            onSelectAddress={handleAddressSelect}
-            placeholder="Start typing your address..."
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            Select an address from the dropdown to see your elevation
+          <p className="text-gray-600">
+            We'll send your customized report with vetted well drilling contractors in your area, including ratings, experience, and pricing estimates.
           </p>
         </div>
 
-        {/* Loading State */}
-        {isLoadingElevation && (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-8 w-8 text-blue-600 animate-spin mr-3" />
-            <span className="text-gray-600">Fetching elevation data...</span>
-          </div>
-        )}
-
-        {/* Error State */}
-        {elevationError && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm font-medium text-red-800">Unable to get elevation</p>
-              <p className="text-sm text-red-600">{elevationError}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Elevation Results */}
-        {elevationResult && !isLoadingElevation && (
+        {elevationResult && (
           <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* Main Elevation Display */}
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 bg-blue-100 rounded-lg">
                   <Mountain className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Your Property Elevation</p>
+                  <p className="text-sm text-gray-500">Your Area Elevation</p>
                   <p className="text-3xl font-bold text-blue-700">
                     {elevationResult.elevation.toLocaleString()} <span className="text-lg font-normal">feet</span>
                   </p>
@@ -285,7 +147,6 @@ export function ElevationForm() {
               </p>
             </div>
 
-            {/* Reservoir Comparisons */}
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
                 <Droplets className="h-5 w-5 text-blue-500" />
@@ -325,7 +186,6 @@ export function ElevationForm() {
               </div>
             </div>
 
-            {/* Info Box */}
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
               <p className="font-medium mb-1">Why does elevation matter?</p>
               <p>
@@ -336,6 +196,120 @@ export function ElevationForm() {
             </div>
           </div>
         )}
+
+        {isLoadingElevation && (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-8 w-8 text-blue-600 animate-spin mr-3" />
+            <span className="text-gray-600">Loading elevation data...</span>
+          </div>
+        )}
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="p-8 max-w-2xl mx-auto">
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Get Your Free Well Driller Analysis
+        </h2>
+        <p className="text-gray-600">
+          Enter your zip code to receive a customized report comparing licensed well drilling contractors in your area—with ratings, pricing estimates, and verified reviews.
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Contact Input */}
+        <div>
+          <div
+            className={`transition-all duration-300 ease-out ${
+              contactMethod === 'email'
+                ? 'opacity-100 translate-x-0 h-auto'
+                : 'opacity-0 -translate-x-4 h-0 overflow-hidden'
+            }`}
+          >
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              Email Address
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Input
+                id="email"
+                type="email"
+                name="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="text-base pl-10"
+              />
+            </div>
+            <ValidationError prefix="Email" field="email" errors={formspreeState.errors} />
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={() => setContactMethod('phone')}
+              className="mt-2 inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            >
+              <Smartphone className="h-3.5 w-3.5" />
+              Get it via SMS / iMessage instead
+            </button>
+          </div>
+
+          <div
+            className={`transition-all duration-300 ease-out ${
+              contactMethod === 'phone'
+                ? 'opacity-100 translate-x-0 h-auto'
+                : 'opacity-0 translate-x-4 h-0 overflow-hidden'
+            }`}
+          >
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+              Phone Number
+            </label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Input
+                id="phone"
+                type="tel"
+                name="phone"
+                placeholder="(303) 555-1234"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="text-base pl-10"
+              />
+            </div>
+            <ValidationError prefix="Phone" field="phone" errors={formspreeState.errors} />
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={() => setContactMethod('email')}
+              className="mt-2 inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            >
+              <Mail className="h-3.5 w-3.5" />
+              Get it via email instead
+            </button>
+          </div>
+        </div>
+
+        {/* Zip Code Input */}
+        <div>
+          <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 mb-2">
+            Zip Code
+          </label>
+          <div className="relative">
+            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Input
+              id="zipCode"
+              type="text"
+              name="zip_code"
+              inputMode="numeric"
+              placeholder="80104"
+              value={zipCode}
+              onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
+              className="text-base pl-10"
+              maxLength={5}
+            />
+          </div>
+        </div>
 
         {/* Submit Button */}
         <Button
