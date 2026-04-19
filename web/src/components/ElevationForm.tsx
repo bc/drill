@@ -1,10 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useForm, ValidationError } from '@formspree/react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
-import { Mail, Phone, Smartphone, Loader2, Mountain, Droplets, CheckCircle2, AlertCircle } from 'lucide-react';
-import { AddressAutocomplete, type AddressDetails } from './AddressAutocomplete';
+import { Mail, Phone, Smartphone, MapPin, Loader2, Mountain, Droplets, CheckCircle2 } from 'lucide-react';
 import { getReservoirsForZipCode, compareElevations, type Reservoir } from '../lib/reservoirData';
 import { getElevation } from '../lib/wellData';
 
@@ -25,65 +24,46 @@ interface ElevationResult {
   }[];
 }
 
+async function geocodeZipCode(zipCode: string): Promise<{ lat: number; lng: number; displayName: string } | null> {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?` +
+        new URLSearchParams({
+          postalcode: zipCode,
+          country: 'us',
+          format: 'json',
+          limit: '1',
+        }),
+      { headers: { 'Accept': 'application/json' } }
+    );
+    if (!response.ok) return null;
+    const results = await response.json();
+    if (results.length === 0) return null;
+    return {
+      lat: parseFloat(results[0].lat),
+      lng: parseFloat(results[0].lon),
+      displayName: results[0].display_name,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export function ElevationForm() {
   const [formspreeState, handleFormspreeSubmit] = useForm("mykjoqzw");
   const [contactMethod, setContactMethod] = useState<ContactMethod>('email');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [addressDetails, setAddressDetails] = useState<AddressDetails | null>(null);
+  const [zipCode, setZipCode] = useState('');
   const [elevationResult, setElevationResult] = useState<ElevationResult | null>(null);
   const [isLoadingElevation, setIsLoadingElevation] = useState(false);
-  const [elevationError, setElevationError] = useState<string | null>(null);
-  const [showResults, setShowResults] = useState(false);
-
-  const handleAddressSelect = useCallback(async (details: AddressDetails) => {
-    setAddressDetails(details);
-    setElevationError(null);
-    setIsLoadingElevation(true);
-
-    try {
-      // Get elevation from API
-      const elevation = await getElevation(details.lat, details.lng);
-
-      if (elevation === null) {
-        setElevationError('Could not retrieve elevation data. Please try again.');
-        setElevationResult(null);
-        return;
-      }
-
-      // Get reservoirs for this zip code
-      const { zoneName, reservoirs } = getReservoirsForZipCode(details.zipCode);
-
-      // Compare elevations
-      const comparisons = compareElevations(elevation, reservoirs);
-
-      setElevationResult({
-        elevation,
-        address: details.formattedAddress,
-        zipCode: details.zipCode,
-        lat: details.lat,
-        lng: details.lng,
-        zoneName,
-        reservoirs,
-        comparisons,
-      });
-    } catch (error) {
-      console.error('Error getting elevation:', error);
-      setElevationError('Failed to retrieve elevation data. Please try again.');
-      setElevationResult(null);
-    } finally {
-      setIsLoadingElevation(false);
-    }
-  }, []);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Build form data to send to Formspree
     const formData = new FormData();
 
-    // Contact info
     if (contactMethod === 'email') {
       formData.append('email', email);
       formData.append('contact_method', 'email');
@@ -92,39 +72,48 @@ export function ElevationForm() {
       formData.append('contact_method', 'phone');
     }
 
-    // Address info
-    formData.append('address', address);
-    if (addressDetails) {
-      formData.append('zip_code', addressDetails.zipCode);
-      formData.append('city', addressDetails.city);
-      formData.append('state', addressDetails.state);
-      formData.append('latitude', addressDetails.lat.toString());
-      formData.append('longitude', addressDetails.lng.toString());
-    }
+    formData.append('zip_code', zipCode.trim());
 
-    // Elevation info
-    if (elevationResult) {
-      formData.append('elevation_feet', elevationResult.elevation.toString());
-      formData.append('zone_name', elevationResult.zoneName);
-      formData.append('reservoirs', elevationResult.reservoirs.map(r =>
-        `${r.name}: ${r.elevation.toLocaleString()} ft`
-      ).join('; '));
-    }
-
-    // Submit to Formspree
     await handleFormspreeSubmit(formData);
-    setShowResults(true);
+    setSubmitted(true);
+
+    setIsLoadingElevation(true);
+    try {
+      const geo = await geocodeZipCode(zipCode.trim());
+      if (geo) {
+        const elevation = await getElevation(geo.lat, geo.lng);
+        if (elevation !== null) {
+          const { zoneName, reservoirs } = getReservoirsForZipCode(zipCode.trim());
+          const comparisons = compareElevations(elevation, reservoirs);
+          setElevationResult({
+            elevation,
+            address: geo.displayName,
+            zipCode: zipCode.trim(),
+            lat: geo.lat,
+            lng: geo.lng,
+            zoneName,
+            reservoirs,
+            comparisons,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error enriching with elevation:', error);
+    } finally {
+      setIsLoadingElevation(false);
+    }
   };
 
   const isFormValid = () => {
+    const hasZip = /^\d{5}$/.test(zipCode.trim());
     if (contactMethod === 'email') {
-      return email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && addressDetails;
+      return email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && hasZip;
     } else {
-      return phone && /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test(phone) && addressDetails;
+      return phone && /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test(phone) && hasZip;
     }
   };
 
-  if (formspreeState.succeeded || showResults) {
+  if (formspreeState.succeeded || submitted) {
     return (
       <Card className="p-8 max-w-2xl mx-auto">
         <div className="text-center py-6 mb-4">
@@ -139,17 +128,15 @@ export function ElevationForm() {
           </p>
         </div>
 
-        {/* Show elevation results after submission */}
         {elevationResult && (
           <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* Main Elevation Display */}
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 bg-blue-100 rounded-lg">
                   <Mountain className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Your Property Elevation</p>
+                  <p className="text-sm text-gray-500">Your Area Elevation</p>
                   <p className="text-3xl font-bold text-blue-700">
                     {elevationResult.elevation.toLocaleString()} <span className="text-lg font-normal">feet</span>
                   </p>
@@ -160,7 +147,6 @@ export function ElevationForm() {
               </p>
             </div>
 
-            {/* Reservoir Comparisons */}
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
                 <Droplets className="h-5 w-5 text-blue-500" />
@@ -200,7 +186,6 @@ export function ElevationForm() {
               </div>
             </div>
 
-            {/* Info Box */}
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
               <p className="font-medium mb-1">Why does elevation matter?</p>
               <p>
@@ -229,7 +214,7 @@ export function ElevationForm() {
           Get Your Free Well Driller Analysis
         </h2>
         <p className="text-gray-600">
-          Enter your address to receive a customized report comparing licensed well drilling contractors in your area—with ratings, pricing estimates, and verified reviews.
+          Enter your zip code to receive a customized report comparing licensed well drilling contractors in your area—with ratings, pricing estimates, and verified reviews.
         </p>
       </div>
 
@@ -305,46 +290,26 @@ export function ElevationForm() {
           </div>
         </div>
 
-        {/* Address Input */}
+        {/* Zip Code Input */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Property Address
+          <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 mb-2">
+            Zip Code
           </label>
-          <AddressAutocomplete
-            value={address}
-            onChange={setAddress}
-            onSelectAddress={handleAddressSelect}
-            placeholder="Start typing your address..."
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            Select an address from the dropdown to see your elevation
-          </p>
+          <div className="relative">
+            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Input
+              id="zipCode"
+              type="text"
+              name="zip_code"
+              inputMode="numeric"
+              placeholder="80104"
+              value={zipCode}
+              onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
+              className="text-base pl-10"
+              maxLength={5}
+            />
+          </div>
         </div>
-
-        {/* Address validation feedback */}
-        {addressDetails && !isLoadingElevation && !elevationError && (
-          <div className="flex items-center gap-2 text-sm text-green-600">
-            <CheckCircle2 className="h-4 w-4" />
-            <span>Address verified</span>
-          </div>
-        )}
-
-        {isLoadingElevation && (
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span>Verifying address...</span>
-          </div>
-        )}
-
-        {elevationError && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm font-medium text-red-800">Unable to verify address</p>
-              <p className="text-sm text-red-600">{elevationError}</p>
-            </div>
-          </div>
-        )}
 
         {/* Submit Button */}
         <Button
